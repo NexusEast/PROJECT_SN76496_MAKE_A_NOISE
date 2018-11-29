@@ -21,7 +21,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f10x.h"
-#include "stm32f10x_map.h"
+#include "pwm.h"
 /** @addtogroup STM32F10x_StdPeriph_Examples
   * @{
   */
@@ -59,7 +59,7 @@ void GPIO_Configuration(void);
   * @param  None
   * @retval None
   */
-int main(void)
+void InitPWM(void)
 {
   /*!< At this stage the microcontroller clock setting is already configured, 
        this is done through SystemInit() function which is called from startup

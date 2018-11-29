@@ -1,5 +1,5 @@
 #include "stm32f10x.h"
- 
+#include "pwm.h"
  void Delay(u32 count)
  {
    u32 i=0;
@@ -7,6 +7,7 @@
  }
  int main(void)
  {	
+	 InitPWM();
   /*GPIO_InitTypeDef  GPIO_InitStructure;
 	 
   RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB|
