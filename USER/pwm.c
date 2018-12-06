@@ -112,30 +112,30 @@ void InitPWM(void)
   TIM_OC1PreloadConfig(TIM3, TIM_OCPreload_Enable);
 
   /* PWM1 Mode configuration: Channel2 */
-  TIM_OCInitStructure.TIM_OutputState = TIM_OutputState_Enable;
-  TIM_OCInitStructure.TIM_Pulse = CCR2_Val;
-
-  TIM_OC2Init(TIM3, &TIM_OCInitStructure);
-
-  TIM_OC2PreloadConfig(TIM3, TIM_OCPreload_Enable);
-
-  /* PWM1 Mode configuration: Channel3 */
-  TIM_OCInitStructure.TIM_OutputState = TIM_OutputState_Enable;
-  TIM_OCInitStructure.TIM_Pulse = CCR3_Val;
-
-  TIM_OC3Init(TIM3, &TIM_OCInitStructure);
-
-  TIM_OC3PreloadConfig(TIM3, TIM_OCPreload_Enable);
-
-  /* PWM1 Mode configuration: Channel4 */
-  TIM_OCInitStructure.TIM_OutputState = TIM_OutputState_Enable;
-  TIM_OCInitStructure.TIM_Pulse = CCR4_Val;
-
-  TIM_OC4Init(TIM3, &TIM_OCInitStructure);
-
-  TIM_OC4PreloadConfig(TIM3, TIM_OCPreload_Enable);
-
-  TIM_ARRPreloadConfig(TIM3, ENABLE);
+  //TIM_OCInitStructure.TIM_OutputState = TIM_OutputState_Enable;
+  //TIM_OCInitStructure.TIM_Pulse = CCR2_Val;
+  //
+  //TIM_OC2Init(TIM3, &TIM_OCInitStructure);
+  //
+  //TIM_OC2PreloadConfig(TIM3, TIM_OCPreload_Enable);
+  //
+  ///* PWM1 Mode configuration: Channel3 */
+  //TIM_OCInitStructure.TIM_OutputState = TIM_OutputState_Enable;
+  //TIM_OCInitStructure.TIM_Pulse = CCR3_Val;
+  //
+  //TIM_OC3Init(TIM3, &TIM_OCInitStructure);
+  //
+  //TIM_OC3PreloadConfig(TIM3, TIM_OCPreload_Enable);
+  //
+  ///* PWM1 Mode configuration: Channel4 */
+  //TIM_OCInitStructure.TIM_OutputState = TIM_OutputState_Enable;
+  //TIM_OCInitStructure.TIM_Pulse = CCR4_Val;
+  //
+  //TIM_OC4Init(TIM3, &TIM_OCInitStructure);
+  //
+  //TIM_OC4PreloadConfig(TIM3, TIM_OCPreload_Enable);
+  //
+  //TIM_ARRPreloadConfig(TIM3, ENABLE);
 
   /* TIM3 enable counter */
   TIM_Cmd(TIM3, ENABLE);
