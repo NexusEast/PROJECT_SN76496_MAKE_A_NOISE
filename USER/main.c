@@ -13,6 +13,7 @@
 	  
 	 // sets channel 0 tone to 0x123
 	 
+	 u8 blab = 0;
 	 	GPIO_InitTypeDef  GPIO_InitStructure;
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOC, ENABLE);
   GPIO_InitStructure.GPIO_Pin = GPIO_Pin_All;			    
@@ -23,19 +24,18 @@
 	 
 	 InitPWM();
 	 SN76496_Init();
-	 delay_init();
+	 //delay_init();
 	 
 	 
 	// WE_Write(Bit_RESET);
-	 //SN76496_SendData(0x83);//‭10000011‬
-	 //SN76496_SendData(0x12);//‭00010010‬
-	 
+	 SN76496_SendData(~0x83); 
+	 SN76496_SendData(~0x12); 
 	 
 	 while(1)
 	 { 		
 		 // sets channel 0 to loudest possible 
-			//SN76496_SendData(0x90);//10010000‬  
-			//SN76496_SendData(0x9F);//10010000‬  
+		SN76496_SendData(blab++);//10010000‬  
+		mydelay(1000); 
 				//b=!b;
 		 
 			/*

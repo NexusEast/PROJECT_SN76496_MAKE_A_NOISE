@@ -2,20 +2,21 @@
 #include "stm32f10x.h"
 #include "delay.h"
 
-
+ void mydelay22(int d)
+ {
+	 int i = 0;
+	 for(i = 0; i < d;i++){}
+ }
 void SN76496_Init(void)
 {
 	GPIO_InitTypeDef  GPIO_InitStructure;
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOC, ENABLE);
   GPIO_InitStructure.GPIO_Pin = GPIO_Pin_All;			    
   GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP; 	
-  GPIO_InitStructure.GPIO_Speed = GPIO_Speed_10MHz;	
+  GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;	
   GPIO_Init(GPIOC, &GPIO_InitStructure); 
 	
-  SN76496_SendData(0x9f);
-  SN76496_SendData(0xbf);
-  SN76496_SendData(0xdf);
-  SN76496_SendData(0xff);
+
 }
  
 
@@ -43,6 +44,7 @@ void SN76496_SendData(unsigned char data)
 	GPIO_WriteBit(GPIOC,GPIO_Pin_6,  (data&64)?Bit_SET:Bit_RESET);
 	GPIO_WriteBit(GPIOC,GPIO_Pin_7,  (data&128)?Bit_SET:Bit_RESET);
 	WE_Write(Bit_RESET);   
-	delay_ms(1);
+	//delay_ms(14*8);
+	mydelay22(50000);
 	WE_Write(Bit_SET);  
 }
