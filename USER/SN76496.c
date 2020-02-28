@@ -1,7 +1,11 @@
 #include "SN76496.h"
 #include "stm32f10x.h"
 #include "delay.h" 
- 
+  void mydelay22(int d)
+ {
+	 int i = 0;
+	 for(i = 0; i < d;i++){}
+ }
  void mydelay2(int d)
  {
 	 int i = 0;
@@ -10,6 +14,7 @@
 void SN76496_Init(void)
 {
 	GPIO_InitTypeDef  GPIO_InitStructure;
+	GPIO_InitTypeDef  GPIO_InitStructure8;
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOC, ENABLE);
   GPIO_InitStructure.GPIO_Pin = GPIO_Pin_All;			    
   GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP; 	
@@ -17,9 +22,9 @@ void SN76496_Init(void)
   GPIO_Init(GPIOC, &GPIO_InitStructure); 
 	WE_Write(Bit_SET);
 		    
-  GPIO_InitStructure.GPIO_Mode = GPIO_Pin_8; 	  
-  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU; 	
-  GPIO_Init(GPIOC, &GPIO_InitStructure); 
+  //GPIO_InitStructure8.GPIO_Mode = GPIO_Pin_8; 	  
+  //GPIO_InitStructure8.GPIO_Mode = GPIO_Mode_IPU; 	
+  //GPIO_Init(GPIOC, &GPIO_InitStructure8); 
 	//mute all channels
 	
 	SN76496_SendData(0x9f);
@@ -58,11 +63,32 @@ void SN76496_UpdateAttenuator(ESN76496Channel channel,unsigned char data)
 	 
 	
 }
-
+u8 psgFrqLowByte = 0;
 void SN76496_SendData(unsigned char data)
 { 
-	// PULL DOWN WE
-	WE_Write(Bit_SET); 
+  //PSG noise channel fix
+  //A bunny fixed the hi-hat for ya'll.
+  if((data & 0x80) == 0)
+  {
+    if((psgFrqLowByte & 0x0F) == 0)
+    {
+      if((data & 0x3F) == 0)
+        psgFrqLowByte |= 1;
+    }
+    SN76496_Write(psgFrqLowByte);
+    SN76496_Write(data);
+  }
+  else if((data & 0x90) == 0x80 && (data & 0x60)>>5 != 3)
+    psgFrqLowByte = data;
+  else
+    SN76496_Write(data);
+}
+
+void SN76496_Write(unsigned char data)
+{ 
+ 
+// 	// PULL DOWN WE
+  	WE_Write(Bit_SET); 
 
 	
 	GPIO_WriteBit(GPIOC,GPIO_Pin_0,  (data&128)?Bit_SET:Bit_RESET);
@@ -75,9 +101,11 @@ void SN76496_SendData(unsigned char data)
 	GPIO_WriteBit(GPIOC,GPIO_Pin_7,  (data&1)?Bit_SET:Bit_RESET);
 	
 	WE_Write(Bit_RESET); 
-//delay_us(14);
-  while(READY_Read()){}
-	while(READY_Read()!=0){}
+	//delay_us(1);
+	mydelay2(1150);
+	//delay_us(14);
+  //while(READY_Read()){}
+	//while(READY_Read()!=0){}
 	//mydelay2(10);
  
 		
@@ -85,5 +113,5 @@ void SN76496_SendData(unsigned char data)
 	//delay_ms(14);
 	//mydelay2(100);
 	
-	//PULL UP WE 
+// 	//PULL UP WE 
 }

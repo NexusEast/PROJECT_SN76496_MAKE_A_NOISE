@@ -12,7 +12,7 @@ void 				CE_Write( BitAction act);
  
 uint8_t 	WE_Read(void);  
 void 				WE_Write( BitAction act);
-
+void SN76496_Write(unsigned char data);
 void SN76496_Init(void);
 void SN76496_SendData(unsigned char data);
 
