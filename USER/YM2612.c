@@ -1,10 +1,13 @@
 #include "YM2612.h"
 
 //Notes
-#define YM_RD GPIOF,GPIO_Pin_13 //YM_RD = PF13
-#define YM_WR GPIOF,GPIO_Pin_12 //YM_WR = PF12
+#define YM_RD GPIOB,GPIO_Pin_13 //YM_RD = PB13
+#define YM_WR GPIOB,GPIO_Pin_12 //YM_WR = PB12
+
+
 #define YM_A0 GPIOF,GPIO_Pin_11  //YM_A0 =PF11
 #define YM_A1 GPIOF,GPIO_Pin_10  //YM_A1 =PF10
+
 #define YM_CS GPIOF,GPIO_Pin_9  //YM_CS = PF9
 #define YM_IC GPIOF,GPIO_Pin_8  //YM_IC = PF8 
 
@@ -89,19 +92,28 @@ void YM2612_Init(void)
     //DATA PIN SETUP
         unsigned char ledft = 0;
     GPIO_InitTypeDef  GPIO_InitStructureC;
+    GPIO_InitTypeDef  GPIO_InitStructureB;
     GPIO_InitTypeDef  GPIO_InitStructure;
     RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOF, ENABLE);
-    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_13|GPIO_Pin_12|GPIO_Pin_11|GPIO_Pin_10|GPIO_Pin_9 |GPIO_Pin_8;			    
+    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_8|GPIO_Pin_9|GPIO_Pin_11|GPIO_Pin_10;			    
     GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP; 	
     GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;	
     GPIO_Init(GPIOF, &GPIO_InitStructure); 
-    
 	
+	
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB, ENABLE);
+    GPIO_InitStructureB.GPIO_Pin = GPIO_Pin_12 |GPIO_Pin_13;		    
+    GPIO_InitStructureB.GPIO_Mode = GPIO_Mode_Out_PP; 	
+    GPIO_InitStructureB.GPIO_Speed = GPIO_Speed_50MHz;	
+    GPIO_Init(GPIOB, &GPIO_InitStructureB); 
+     
     RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOC, ENABLE);
     GPIO_InitStructureC.GPIO_Pin = GPIO_Pin_0|GPIO_Pin_1|GPIO_Pin_2|GPIO_Pin_3|GPIO_Pin_4|GPIO_Pin_5|GPIO_Pin_6|GPIO_Pin_7;			    
     GPIO_InitStructureC.GPIO_Mode = GPIO_Mode_Out_PP; 	
     GPIO_InitStructureC.GPIO_Speed = GPIO_Speed_50MHz;	
     GPIO_Init(GPIOC, &GPIO_InitStructureC); 
+	
+	 
 
 
     GPIO_WriteBit(YM_CS,Bit_RESET); //_CS HIGH 

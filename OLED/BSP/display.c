@@ -23,7 +23,7 @@ void InitDisplay(void)
 		/* LCD IS CONNECTED TO i2c-2
 			 change this if you are using other ports
 		 */
-		SSD1306_Init(I2C1);
+		SSD1306_Init(I2C2);
 }
 
 void ClearDisplay(void)
