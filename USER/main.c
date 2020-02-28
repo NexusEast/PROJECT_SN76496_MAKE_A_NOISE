@@ -290,7 +290,7 @@ void TIM4_IRQHandler(void)
   if (TIM_GetITStatus(TIM4, TIM_IT_Update) != RESET)
   {
     TIM_ClearITPendingBit(TIM4, TIM_IT_Update);  
-		//if( playbackState == 1)
+		if( playbackState == 1)
 		{
     LED1=!LED1; 
     {
@@ -327,8 +327,7 @@ u8 curmsgline = 1;
 char *curlog = "";  
 char *prevlog = "";
 void PrintMsg(char* msg)
-{ 
-	return;
+{  
   prevlog = curlog;
 	curlog = msg;
 	WriteDisplayNoClear(prevlog , DISPLAY_BLUE_COLOR , 0 , 5); 
@@ -569,10 +568,10 @@ int main(void)
 	u8 bbb=0;
   delay_init();
    InitLED();  
-	//KEY_Init();
-	//NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);//设置中断优先级分组为组2：2位抢占优先级，2位响应优先级
-	//uart_init(115200);	 	//串口初始化为115200
-	//InitDisplay();    	
+	KEY_Init();
+	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);//设置中断优先级分组为组2：2位抢占优先级，2位响应优先级
+	uart_init(115200);	 	//串口初始化为115200
+	InitDisplay();    	
 #ifndef DISABLE_PLAYBACK
   YM2612_Init();
   InitPWM();
@@ -586,7 +585,10 @@ int main(void)
 	printf("INIT SD CARD");
  	 TestSDCard();
 #else
-//StartPlayback();
+	 PrintMsg( "SELF TEST");   
+	 PrintMsg( "MODE ENABLED");   
+	printf("SELF_TEST\r\r\n");
+StartPlayback();
 #endif
   while (1){
 		ScanKeys();
