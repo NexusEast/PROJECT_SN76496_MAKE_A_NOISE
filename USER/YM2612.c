@@ -88,13 +88,20 @@ void YM2612_Init(void)
 {
     //DATA PIN SETUP
         unsigned char ledft = 0;
+    GPIO_InitTypeDef  GPIO_InitStructureC;
     GPIO_InitTypeDef  GPIO_InitStructure;
     RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOF, ENABLE);
-    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_All;			    
+    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_13|GPIO_Pin_12|GPIO_Pin_11|GPIO_Pin_10|GPIO_Pin_9 |GPIO_Pin_8;			    
     GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP; 	
     GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;	
     GPIO_Init(GPIOF, &GPIO_InitStructure); 
     
+	
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOC, ENABLE);
+    GPIO_InitStructureC.GPIO_Pin = GPIO_Pin_0|GPIO_Pin_1|GPIO_Pin_2|GPIO_Pin_3|GPIO_Pin_4|GPIO_Pin_5|GPIO_Pin_6|GPIO_Pin_7;			    
+    GPIO_InitStructureC.GPIO_Mode = GPIO_Mode_Out_PP; 	
+    GPIO_InitStructureC.GPIO_Speed = GPIO_Speed_50MHz;	
+    GPIO_Init(GPIOC, &GPIO_InitStructureC); 
 
 
     GPIO_WriteBit(YM_CS,Bit_RESET); //_CS HIGH 
@@ -126,14 +133,14 @@ void YM2612_Send8BitData(const unsigned char data)
     //GPIOF->ODR =0;
     //GPIOF->ODR = data;
     
-	 GPIO_WriteBit(GPIOF,GPIO_Pin_7,  (data&128)?Bit_SET:Bit_RESET);
-	 GPIO_WriteBit(GPIOF,GPIO_Pin_6,  (data&64)?Bit_SET:Bit_RESET);
-	 GPIO_WriteBit(GPIOF,GPIO_Pin_5,  (data&32)?Bit_SET:Bit_RESET);
-	 GPIO_WriteBit(GPIOF,GPIO_Pin_4,  (data&16)?Bit_SET:Bit_RESET);
-	 GPIO_WriteBit(GPIOF,GPIO_Pin_3,  (data&8)?Bit_SET:Bit_RESET);
-	 GPIO_WriteBit(GPIOF,GPIO_Pin_2,  (data&4)?Bit_SET:Bit_RESET);
-	 GPIO_WriteBit(GPIOF,GPIO_Pin_1,  (data&2)?Bit_SET:Bit_RESET);
-	 GPIO_WriteBit(GPIOF,GPIO_Pin_0,  (data&1)?Bit_SET:Bit_RESET);
+	 GPIO_WriteBit(GPIOC,GPIO_Pin_7,  (data&128)?Bit_SET:Bit_RESET);
+	 GPIO_WriteBit(GPIOC,GPIO_Pin_6,  (data&64)?Bit_SET:Bit_RESET);
+	 GPIO_WriteBit(GPIOC,GPIO_Pin_5,  (data&32)?Bit_SET:Bit_RESET);
+	 GPIO_WriteBit(GPIOC,GPIO_Pin_4,  (data&16)?Bit_SET:Bit_RESET);
+	 GPIO_WriteBit(GPIOC,GPIO_Pin_3,  (data&8)?Bit_SET:Bit_RESET);
+	 GPIO_WriteBit(GPIOC,GPIO_Pin_2,  (data&4)?Bit_SET:Bit_RESET);
+	 GPIO_WriteBit(GPIOC,GPIO_Pin_1,  (data&2)?Bit_SET:Bit_RESET);
+	 GPIO_WriteBit(GPIOC,GPIO_Pin_0,  (data&1)?Bit_SET:Bit_RESET);
 }
 void YM2612_Reset(void)
 { 

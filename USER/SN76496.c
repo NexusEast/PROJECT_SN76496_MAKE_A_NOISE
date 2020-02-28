@@ -1,6 +1,36 @@
 #include "SN76496.h"
 #include "stm32f10x.h"
 #include "delay.h" 
+/*
+
+//FOR 76498 DATA PIN 0-
+PD6     FIFO_WRST      
+PG6     NRF_IRQ        
+PG7     NRF_CS         
+PG8     NRF_CE         
+PG11    1WIRE_DQ       
+PG13    OV_SDA         
+PG14    FIFO_RRST      
+PG15    FIFO_OE        
+//CONTROL PIN
+PF6     VS_XDCS        
+PF7     VS_XCS         
+
+*/
+
+//FOR 76498 DATA PIN 0-7
+#define SN76496_D0 GPIOD,GPIO_Pin_6 //PD6     FIFO_WRST      
+#define SN76496_D1 GPIOG,GPIO_Pin_6 //PG6     NRF_IRQ        
+#define SN76496_D2 GPIOG,GPIO_Pin_7 //PG7     NRF_CS         
+#define SN76496_D3 GPIOG,GPIO_Pin_8 //PG8     NRF_CE         
+#define SN76496_D4 GPIOG,GPIO_Pin_11 //PG11    1WIRE_DQ       
+#define SN76496_D5 GPIOG,GPIO_Pin_13 //PG13    OV_SDA         
+#define SN76496_D6 GPIOG,GPIO_Pin_14 //PG14    FIFO_RRST      
+#define SN76496_D7 GPIOG,GPIO_Pin_15 //PG15    FIFO_OE  
+//control pin
+#define SN76496_WE GPIOF,GPIO_Pin_6 //PF6
+#define SN76496_RDY GPIOF,GPIO_Pin_7 //PF7
+
   void mydelay22(int d)
  {
 	 int i = 0;
@@ -13,13 +43,30 @@
  }
 void SN76496_Init(void)
 {
-	GPIO_InitTypeDef  GPIO_InitStructure;
-	GPIO_InitTypeDef  GPIO_InitStructure8;
-	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOC, ENABLE);
-  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_All;			    
-  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP; 	
-  GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;	
-  GPIO_Init(GPIOC, &GPIO_InitStructure); 
+	GPIO_InitTypeDef  GPIO_InitStructure_D;
+	GPIO_InitTypeDef  GPIO_InitStructure_G;
+	GPIO_InitTypeDef  GPIO_InitStructure_F;
+	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOD, ENABLE);
+	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOG, ENABLE);
+	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOF, ENABLE);
+  GPIO_InitStructure_D.GPIO_Pin = GPIO_Pin_6;			    
+  GPIO_InitStructure_D.GPIO_Mode = GPIO_Mode_Out_PP; 	
+  GPIO_InitStructure_D.GPIO_Speed = GPIO_Speed_50MHz;	
+  GPIO_Init(GPIOD, &GPIO_InitStructure_D); 
+	
+	
+  GPIO_InitStructure_G.GPIO_Pin = GPIO_Pin_6  |GPIO_Pin_7  |GPIO_Pin_8  |GPIO_Pin_11 |GPIO_Pin_13 |GPIO_Pin_14 |GPIO_Pin_15;			    
+  GPIO_InitStructure_G.GPIO_Mode = GPIO_Mode_Out_PP; 	
+  GPIO_InitStructure_G.GPIO_Speed = GPIO_Speed_50MHz;	
+  GPIO_Init(GPIOG, &GPIO_InitStructure_G); 
+	
+	
+  GPIO_InitStructure_F.GPIO_Pin = GPIO_Pin_6;			    
+  GPIO_InitStructure_F.GPIO_Mode = GPIO_Mode_Out_PP; 	
+  GPIO_InitStructure_F.GPIO_Speed = GPIO_Speed_50MHz;	
+  GPIO_Init(GPIOF, &GPIO_InitStructure_F); 
+	
+	
 	WE_Write(Bit_SET);
 		    
   //GPIO_InitStructure8.GPIO_Mode = GPIO_Pin_8; 	  
@@ -42,7 +89,7 @@ uint8_t READY_Read(void)
   
 void WE_Write( BitAction act)
 { 
-	GPIO_WriteBit(GPIOC,GPIO_Pin_9,act); 
+	GPIO_WriteBit(SN76496_WE,act); 
 }
 
 /*
@@ -91,14 +138,14 @@ void SN76496_Write(unsigned char data)
   	WE_Write(Bit_SET); 
 
 	
-	GPIO_WriteBit(GPIOC,GPIO_Pin_0,  (data&128)?Bit_SET:Bit_RESET);
-	GPIO_WriteBit(GPIOC,GPIO_Pin_1,  (data&64)?Bit_SET:Bit_RESET);
-	GPIO_WriteBit(GPIOC,GPIO_Pin_2,  (data&32)?Bit_SET:Bit_RESET);
-	GPIO_WriteBit(GPIOC,GPIO_Pin_3,  (data&16)?Bit_SET:Bit_RESET);
-	GPIO_WriteBit(GPIOC,GPIO_Pin_4,  (data&8)?Bit_SET:Bit_RESET);
-	GPIO_WriteBit(GPIOC,GPIO_Pin_5,  (data&4)?Bit_SET:Bit_RESET);
-	GPIO_WriteBit(GPIOC,GPIO_Pin_6,  (data&2)?Bit_SET:Bit_RESET);
-	GPIO_WriteBit(GPIOC,GPIO_Pin_7,  (data&1)?Bit_SET:Bit_RESET);
+	GPIO_WriteBit(SN76496_D0,  (data&128)?Bit_SET:Bit_RESET);
+	GPIO_WriteBit(SN76496_D1,  (data&64)?Bit_SET:Bit_RESET);
+	GPIO_WriteBit(SN76496_D2,  (data&32)?Bit_SET:Bit_RESET);
+	GPIO_WriteBit(SN76496_D3,  (data&16)?Bit_SET:Bit_RESET);
+	GPIO_WriteBit(SN76496_D4,  (data&8)?Bit_SET:Bit_RESET);
+	GPIO_WriteBit(SN76496_D5,  (data&4)?Bit_SET:Bit_RESET);
+	GPIO_WriteBit(SN76496_D6,  (data&2)?Bit_SET:Bit_RESET);
+	GPIO_WriteBit(SN76496_D7,  (data&1)?Bit_SET:Bit_RESET);
 	
 	WE_Write(Bit_RESET); 
 	//delay_us(1);

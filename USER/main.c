@@ -328,6 +328,7 @@ char *curlog = "";
 char *prevlog = "";
 void PrintMsg(char* msg)
 {  
+		ClearDisplay();
   prevlog = curlog;
 	curlog = msg;
 	WriteDisplayNoClear(prevlog , DISPLAY_BLUE_COLOR , 0 , 5); 
