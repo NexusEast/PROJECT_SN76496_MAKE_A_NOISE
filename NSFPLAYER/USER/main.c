@@ -353,23 +353,27 @@ void Single6502Tick(int interval)
     // uP wants to read so Arduino to drive databus to uP:
 		if(0xFFFC == uP_ADDR)
 		{
-			
+			data = 0X00;
 			WriteToCPU(0X00);//ROM_START_ADDR%0xFF);
 		}
 		else if(0xFFFD == uP_ADDR)
 		{
+			data = 0x80;
 			WriteToCPU(0x80);//ROM_START_ADDR>>8);
 		}
 		else if(uP_ADDR >=0 && uP_ADDR < RAMSIZE)//RAM READ
 		{
+			data = CPURAM[uP_ADDR];
 			WriteToCPU(CPURAM[uP_ADDR]);
 		} 
 		else if(uP_ADDR >=APU_REG_START && uP_ADDR < APU_REG_START+APU_REG_SIZE)//APU READ
 		{
+			data =APUREG[uP_ADDR-APU_REG_START];
 			WriteToCPU(APUREG[uP_ADDR-APU_REG_START]);
 		}
 		else if(uP_ADDR >=ROM_START_ADDR && uP_ADDR < ROM_START_ADDR + ROM_SIZE)//ROM READ
 		{
+			data = CPUROM[uP_ADDR - ROM_START_ADDR];
 			WriteToCPU(CPUROM[uP_ADDR - ROM_START_ADDR]);
 		} 
 	  }
