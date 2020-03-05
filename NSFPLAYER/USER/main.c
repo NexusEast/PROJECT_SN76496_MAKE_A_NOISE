@@ -80,6 +80,8 @@ u8 CPURAM[RAMSIZE] = {0};
 u8 CPUROM[ROM_SIZE] = {0};
 u8 APUREG[APU_REG_SIZE]={0};
 
+#define FULLSPEED_MODE
+
 unsigned char PROGRAM[42] = {
 	0xA9, 0xE0, 0x8D, 0x00, 0x40, 0xA9, 0xFF, 0x8D, 0x01, 0x40, 0xA9, 0x80, 0x8D, 0x02, 0x40, 0xA9, 
 	0x80, 0x8D, 0x03, 0x40, 0xA9, 0x07, 0x8D, 0x15, 0x40, 0xA2, 0x00, 0xA0, 0x00, 0xE8, 0xC8, 0xC0, 
@@ -329,27 +331,13 @@ void Single6502Tick(int interval)
   // Let's capture the ADDR bus
   uP_ADDR = CPU2A03_READ_ADDR();
     isread = IsRead();
+	 
 	 	tickcount%=0x10;
 	 
-  if (isread)     
-  //////////////////////////////////////////////////////////////////
-  // HIGH = READ transaction
+  if (isread) // HIGH = READ transaction     
   {
-		/*
-		if(0xFFFC == uP_ADDR)
-		{
-			
-			WriteToCPU(0X00);//ROM_START_ADDR%0xFF);
-		}
-		else if(0xFFFD == uP_ADDR)
-		{
-			WriteToCPU(0X80);//ROM_START_ADDR>>8);
-		}
-		else
-		WriteToCPU(data);
-		if(0)*/
-		
-		{
+ 
+		 
     // uP wants to read so Arduino to drive databus to uP:
 		if(0xFFFC == uP_ADDR)
 		{
@@ -375,16 +363,9 @@ void Single6502Tick(int interval)
 		{
 			data = CPUROM[uP_ADDR - ROM_START_ADDR];
 			WriteToCPU(CPUROM[uP_ADDR - ROM_START_ADDR]);
-		} 
-	  }
-		//else
-		//{
-			//WriteToCPU(data);
-		//} 
+		}  
   } 
-  else 
-  //////////////////////////////////////////////////////////////////
-  // R/W = LOW = WRITE
+  else //R/W = LOW = WRITE 
   {
 		data = ReadFromCPU();
 		if(uP_ADDR >=0 && uP_ADDR < RAMSIZE)//RAM WRITE
@@ -397,27 +378,12 @@ void Single6502Tick(int interval)
 		}
 		 
   }
-
-  ////////////////////////////////////////////////////////////////
-  // We are done with this cycle.
-
-  // one full cycle complete
- // clock_cycle_count ++;
-
-  // start next cycle
-	//puredelay(900);
-  //GPIO_WriteBit(GPIOB, GPIO_Pin_0, Bit_RESET);
-	 
-	sprintf(bit,"%1X A:%04X,D:%02X %c %c",tickcount++,uP_ADDR,data,(isread? 'R':'W'),(m2? 'H':'L')); 
-	//sprintf(bit,"%1X A:%04X",tickcount++,uP_ADDR); 
-
-			 
-
-			oledPrintOneLine(bit,0);
-	delay(interval);
-  // If Arduino was driving the bus, no need anymore.
-  // natural delay for DATA Hold time after CLK goes low (t_HR)
-  //DATA_DIR = DIR_IN;  
+ 
+#ifndef FULLSPEED_MODE 
+	sprintf(bit,"%1X A:%04X,D:%02X %c %c",tickcount++,uP_ADDR,data,(isread? 'R':'W'),(m2? 'H':'L'));  
+	oledPrintOneLine(bit,0);
+	delay(interval); 
+#endif
 }
 
 void InitInterrupt()
@@ -451,33 +417,13 @@ void InitInterrupt()
 	
 } 
 void EXTI9_5_IRQHandler(void)
-{ 
-//		delay(100);//消抖
+{  
 	       if(EXTI_GetITStatus(EXTI_Line8) !=RESET)
         { 
 								Single6502Tick(0);
                 EXTI_ClearITPendingBit(EXTI_Line8);
         }
-	/*
-	char bit[20] = {0};
-	u16 uP_ADDR = 0;
-	u8 isread = 0;
-	u8 data = 0xEA;
-	delay(100);//消抖
-				
-  uP_ADDR = CPU2A03_READ_ADDR();
-  isread = IsRead();	
-  if (isread)      
-    WriteToCPU(data);
-	else
-	{ 
-		data = ReadFromCPU();
-	}
-	sprintf(bit,"IRQ A:%04X,D:%02X[%c]",uP_ADDR,data,(isread? 'R':'W')); 
-			 
-
-			oledPrintOneLine(bit,0);
-	*/ 
+ 
 }
 
 void TickClock(int interval,int ticks)
@@ -507,58 +453,40 @@ void TIM4_IRQHandler(void)
 char bit[20] = {0};
 	u16 uP_ADDR = 0;
 	u8 isread = 0;
-	u8 data = 0; 
-  // Drive CLK high 
-  
-  // Let's capture the ADDR bus
-	 InitDisplay();
-	  //InitPWM ();//PA6@24MHZ
-	 InitManualClock();
-	 SETUP_2A03_ADDRESSLINE();
-  InitInterrupt();
-	//NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2); //设置NVIC中断分组2:2位抢占优先级，2位响应优先级
-	 oledPrint("2A03 TEST");
-	 oledPrint("2A03 TEST"); 
+	u8 data = 0;  
+
+
 	InitProgram();
+	SETUP_2A03_ADDRESSLINE(); 
+  InitInterrupt(); 
+
+	//NMI SETUP
 	//InitNMIInterrupt();
   //InitTickTImer(1800,300);//60HZ
+
+
+#ifdef FULLSPEED_MODE
+	InitPWM ();//PA6@24MHZ
+
+	 oledPrint("2A03 FULLSPEED MODE");
+	 oledPrint("2A03 TEST");
+#else 
+	 InitDisplay(); 
+	 InitManualClock();
+	 oledPrint("2A03 DEBUG MODE");
+	 oledPrint("2A03 TEST");
+#endif
+
     while (1)
     {
+#ifndef FULLSPEED_MODE
 			delay(10);
-			GPIO_WriteBit(GPIOB, GPIO_Pin_0, CLK); 
-			//GPIO_WriteBit(GPIOA, GPIO_Pin_15, CLK); 
+			GPIO_WriteBit(GPIOB, GPIO_Pin_0, CLK);  
 			CLK=!CLK;
-			//Single6502Tick(0);
-  //uP_ADDR = CPU2A03_READ_ADDR();
-  //isread = IsRead();	  
-		//data = ReadFromCPU(); 
-	//tickcount%=0x10;
-		//	sprintf(bit,"[%1X]A:%04X,D:%02X[%c]",tickcount++,uP_ADDR,data,(isread? 'R':'W')); 
-			//oledPrintOneLine(bit,1);
-			//Single6502Tick(100);
+#endif
+		 
     }
 
 	}
  
-	 
-/**
-*******************下面注释掉的代码是通过 直接操作寄存器 方式实现IO口控制**************************************
-int main(void)
-{ 
- 
-	delay_init();		  //初始化延时函数
-	LED_Init();		        //初始化LED端口
-	while(1)
-	{
-     GPIOB->BRR=GPIO_Pin_5;//LED0亮
-	   GPIOE->BSRR=GPIO_Pin_5;//LED1灭
-		 delay_ms(300);
-     GPIOB->BSRR=GPIO_Pin_5;//LED0灭
-	   GPIOE->BRR=GPIO_Pin_5;//LED1亮
-		 delay_ms(300);
-
-	 }
- }
-**************************************************************************************************
-**/
-
+	  
